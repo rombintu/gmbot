@@ -1,12 +1,13 @@
 # Internal
 import os
-
+import time
 # Local
 from bot import Bot
 import utils
 
 # External
 from dotenv import load_dotenv
+import schedule
 
 def pretty_info():
     finance = '\n'
@@ -46,10 +47,15 @@ def pretty_info():
     buff += host_data
     return buff
 
-def main():
-    load_dotenv()
-    bot = Bot(os.getenv("TOKEN"), os.getenv("UUID"))
+
+load_dotenv()
+bot = Bot(os.getenv("TOKEN"), os.getenv("UUID"))
+
+def run():
     bot.send_message(pretty_info())
 
 if __name__ == "__main__":
-    main()
+    schedule.every().day.at("14:53").do(run)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
