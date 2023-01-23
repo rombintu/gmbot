@@ -50,14 +50,14 @@ def get_weather():
         return []
 
 
-def get_ipaddr():
-    try:
-        hostname = socket.gethostname()
-        ipaddr = ni.ifaddresses('wlp2s0')[ni.AF_INET][0]['addr']
-        return [hostname, ipaddr]
-    except Exception as err:
-        print(err)
-        return []
+# def get_ipaddr():
+#     try:
+#         hostname = socket.gethostname()
+#         ipaddr = ni.ifaddresses('wlp2s0')[ni.AF_INET][0]['addr']
+#         return [hostname, ipaddr]
+#     except Exception as err:
+#         print(err)
+#         return []
 
 def get_time():
     return datetime.datetime.today().strftime("%A, %d.%m.%Y")
