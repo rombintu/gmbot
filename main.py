@@ -55,7 +55,7 @@ def run():
     bot.send_message(pretty_info())
 
 if __name__ == "__main__":
-    schedule.every().day.at("14:53").do(run)
+    schedule.every().day.at("09:00").do(run)
     while True:
         schedule.run_pending()
         time.sleep(1)
