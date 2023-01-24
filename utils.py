@@ -1,10 +1,8 @@
 import requests
 import datetime
 import locale
-import socket
 
 from bs4 import BeautifulSoup as BS
-import netifaces as ni
 
 locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
 
