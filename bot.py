@@ -1,13 +1,47 @@
-import requests
+import os
 
-class Bot:
-    def __init__(self, token):
-        self.token = token
-        # self.uuid = uuid
+from store.store import Database
+from telebot import TeleBot
+from content import acivate_message, deactivate_message
+from utils import pretty_info
+from dotenv import load_dotenv
+load_dotenv()
 
-    def send_message(self, text, too):
-        response = requests.post(
-                url='https://api.telegram.org/bot{0}/sendMessage'.format(self.token),
-                data={'chat_id': too, 'text': text, 'parse_mode': 'markdown'}
-            ).json()
-        print(response)
+bot = TeleBot(os.getenv("TOKEN"), parse_mode=None)
+store = Database(os.getenv("STORE", "sqlite:///store/db.sqlite"))
+
+
+@bot.message_handler(commands=['start', 'activate'])
+def handle_message_start(message):
+    store.login(message.chat.id)
+    bot.send_message(
+        message.chat.id, 
+        acivate_message
+    )
+    bot.send_message(
+        message.chat.id, 
+        pretty_info(), 
+        parse_mode="markdown"
+    )
+
+@bot.message_handler(commands=['deactivate'])
+def handle_message_start(message):
+    store.deactivate(message.chat.id)
+    bot.send_message(
+        message.chat.id, 
+        deactivate_message
+    )
+
+@bot.message_handler(commands=['try'])
+def handle_message_start(message):
+    bot.send_message(
+        message.chat.id, 
+        pretty_info(), 
+        parse_mode="markdown"
+    )
+
+def notify():
+    users = store.get_users()
+    mess = pretty_info()
+    for u in users:
+        bot.send_message(u, mess, parse_mode="markdown")
