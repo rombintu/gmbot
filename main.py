@@ -1,19 +1,18 @@
 from bot import bot, notify
 import schedule
-import asyncio
+import threading, time, logging
 
-schedule.every().day.at("07:00").do(notify)
+schedule.every().day.at("14:27").do(notify)
 
-async def scheduler():
+def scheduler():
+    logging.info("Scheduler is starting...")
     while True:
         schedule.run_pending()
-        await asyncio.sleep(1)
-
-async def main():
-    print("Service is starting...")
-    async_scheduler = asyncio.create_task(scheduler())
-    await async_scheduler
-    await bot.polling(none_stop=True, timeout=60)
+        time.sleep(1)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    sch = threading.Thread(target=scheduler)
+    sch.start()
+    logging.info("Service is starting...")
+    bot.polling(none_stop=True, timeout=60)
+    
