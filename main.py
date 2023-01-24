@@ -2,7 +2,7 @@ from bot import bot, notify
 import schedule
 import threading, time, logging
 
-schedule.every().day.at("14:27").do(notify)
+schedule.every().day.at("07:00").do(notify)
 
 def scheduler():
     logging.info("Scheduler is starting...")
