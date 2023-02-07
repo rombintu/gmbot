@@ -22,13 +22,14 @@ def get_finance_bitcoin():
         print(err)
         return 0
 
-def get_holiday():
+def get_holiday(tomorrow=False):
     try:
         data = requests.get("https://www.calend.ru/")
         soup = BS(data.text, 'html.parser')
-        ans = soup.find("ul", class_="itemsNet").find("span", "title").\
-            getText().split(":")[-1].split(",")
-        return ans
+        all_holidays = soup.find("ul", class_="itemsNet").find_all("li", class_="one-two")
+        today = all_holidays[0].find("div", class_="caption").text.strip()
+        tomorrow = all_holidays[-1].find("div", class_="caption").text.strip()
+        return [today, tomorrow]
     except Exception as err:
         print(err)
         return []
@@ -68,19 +69,16 @@ def pretty_info():
 
     holidays = get_holiday()
     if not holidays:
-        holiday += "Праздники не загружаются ⚠️"
-    else:
-        holiday = holidays[0].strip()
-
+        holidays = ["Праздники не загружаются ⚠️", "Праздники не загружаются ⚠️"]
     if not w_data:
         weather += "Невозможно загрузить погоду ⚠️"
     else:
-        weather += f"Погода: *{w_data[0]}* _{w_data[-1]}_\n{w_data[1]}"
+        weather += f"*{w_data[0]}°C*\n_{w_data[-1]}_\n{w_data[1]}"
 
     
 
-    buff = f"Доброе утро!\n*{get_time()}*"
-    buff += f"\nСегодня {holiday}"
+    buff = f"*Доброе утро!*\n"
+    buff += f'\n```\tСегодня {holidays[0]}\n\tЗавтра {holidays[-1]}```'
     buff += finance + "\n"
     buff += weather
     return buff
