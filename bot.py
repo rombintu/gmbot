@@ -44,4 +44,7 @@ def notify():
     users = store.get_users()
     mess = pretty_info()
     for u in users:
-        bot.send_message(u, mess, parse_mode="markdown")
+        try:
+            bot.send_message(u, mess, parse_mode="markdown")
+        except Exception as err:
+            pass

@@ -3,6 +3,7 @@ import schedule
 import threading, time, logging
 
 schedule.every().day.at("07:00").do(notify)
+# schedule.every().minute.do(notify) # DEV
 
 def scheduler():
     logging.info("Scheduler is starting...")
