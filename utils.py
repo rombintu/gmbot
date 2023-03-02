@@ -1,8 +1,10 @@
 import requests
 import datetime
 import locale
+from store.store import Database
 
 from bs4 import BeautifulSoup as BS
+from content import horoscopes
 
 locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
 
@@ -51,12 +53,26 @@ def get_weather():
 def get_time():
     return datetime.datetime.today().strftime("%A, %d.%m.%Y")
 
+def get_horoscope(target="aries"):
+    try:
+        data = requests.get(f"https://www.thevoicemag.ru/horoscope/daily/{target}")
+        soup = BS(data.text, 'html.parser')
+        ans = soup.find("div", class_="sign__description-text")
+        return [target, ans.text]
+    except Exception as err:
+        print(err)
+        return []
+
+def get_horoscopies():
+    data = {}
+    for hrs in horoscopes:
+        key, val = get_horoscope(hrs)
+        data[key] = val
+    return data
 
 def pretty_info():
     finance = '\n'
-    holiday = '\n'
     weather = '\n'
-    
 
     usd, eur = get_finance_rub()
     bitcoin = get_finance_bitcoin()
@@ -81,4 +97,13 @@ def pretty_info():
     buff += f'\n```\tСегодня {holidays[0]}\n\tЗавтра {holidays[-1]}```'
     buff += finance + "\n"
     buff += weather
+    buff += "\n\n_Ежедневный гороскоп_. Чтобы настроить /settings\n\t```{}```"
     return buff
+
+def restore(backup, target):
+    backup_db = Database(backup)
+    target_db = Database(target)
+    users = backup_db.get_users_uuids()
+    for u in users:
+        target_db.login(u[0])
+        print(f"User: {u[0]} - restore")

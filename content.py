@@ -5,3 +5,33 @@ acivate_message = """Добрый день!
 Отписаться: /deactivate"""
 
 deactivate_message = "Вы отписались от рассылки. Вернуть: /activate"
+
+horoscopes = [
+    "aries", # Oven
+    "taurus", # Teletc
+    "gemini", # Bliznecy
+    "cancer", # Rak
+    "leo", # Lev
+    "virgo", # Deva
+    "libra", # Vesy
+    "scorpio", # Scorpio
+    "sagittarius", # Streletc
+    "capricorn", # Kozerok
+    "aquarius", # Vodoley
+    "pisces", # Riby
+]
+
+horoscopes_pretty = [
+    "♈️ Овен",
+    "♉️ Телец",
+    "♊️ Близнецы",
+    "♋️ Рак",
+    "♌️ Лев",
+    "♍️ Дева",
+    "♎️ Весы",
+    "♏️ Скорпион",
+    "♐️ Стрелец",
+    "♑️ Козерог",
+    "♒️ Водолей",
+    "♓️ Рыбы",
+]

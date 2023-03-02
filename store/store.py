@@ -1,6 +1,6 @@
 # external imports
 from sqlalchemy import create_engine, Column, MetaData, Table
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, select, update, delete
 
 # from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy import Integer, String, Boolean
@@ -16,7 +16,8 @@ Users = Table(
     Metadata,
     Column("_id", Integer, primary_key=True),
     Column("uuid", Integer, unique=True),
-    Column("activate", Boolean)
+    Column("activate", Boolean),
+    Column("horoscope", String, default="aries")
 )
 
 class User(Base):
@@ -27,11 +28,11 @@ class Database:
         self.engine = create_engine(engine)
         Metadata.create_all(self.engine)
                 
-
+    
     def login(self, uuid):
         with self.engine.connect() as c:
             with c.begin():
-                select_user = select(User).where(User.uuid == uuid)
+                select_user = select(User.uuid).where(User.uuid == uuid)
                 login = c.execute(select_user).first()
                 if not login:
                     create_user = (
@@ -54,4 +55,36 @@ class Database:
             with c.begin():
                 users_exec = select(User).where(User.activate == True)
                 users = c.execute(users_exec).all()
-                return [user["uuid"] for user in users]
+                return users
+            
+    def get_users_uuids(self):
+        with self.engine.connect() as c:
+            with c.begin():
+                users_exec = select(User.uuid).where(User.activate == True)
+                users = c.execute(users_exec).all()
+                return users
+            
+    def get_user(self, uuid):
+        with self.engine.connect() as c:
+            with c.begin():
+                user_exec = select(User).where(User.activate == True, User.uuid == uuid)
+                user = c.execute(user_exec).one()
+                return user
+            
+    def delete_user(self, uuid):
+        with self.engine.connect() as c:
+            with c.begin():
+                delete_user_exec = delete(User).where(User.uuid == uuid)
+                try:
+                    c.execute(delete_user_exec)
+                except Exception as err:
+                    print(err)
+
+    def user_update_horoscope(self, uuid, new_horoscope):
+        with self.engine.connect() as c:
+            with c.begin():
+                update_user = update(User).where(User.uuid == uuid).values(horoscope=new_horoscope)
+                try:
+                    c.execute(update_user)
+                except Exception as err:
+                    print(err)
