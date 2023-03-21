@@ -17,7 +17,7 @@ Users = Table(
     Column("_id", Integer, primary_key=True),
     Column("uuid", Integer, unique=True),
     Column("activate", Boolean),
-    Column("horoscope", String, default="aries")
+    Column("horoscope", String, default="none")
 )
 
 class User(Base):

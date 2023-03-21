@@ -36,7 +36,7 @@ def get_holiday(tomorrow=False):
         print(err)
         return []
 
-def get_weather():
+def get_weather_to_day():
     try:
         data = requests.get("https://meteoinfo.ru/forecasts/russia/moscow-area/moscow")
         soup = BS(data.text, 'html.parser')
@@ -49,11 +49,24 @@ def get_weather():
     except Exception as err:
         print(err)
         return []
+    
+def get_weather_to_now():
+    try:
+        data = requests.get("https://www.yandex.ru/pogoda/moscow?lat=55.755863&lon=37.6177")
+        soup = BS(data.text, 'html.parser')
+        ans = soup.find("div", class_="fact card card_size_big")
+        weather = ans.find("div", class_="temp fact__temp fact__temp_size_s").text
+        return [weather]
+    except Exception as err:
+        print(err)
+        return []
 
 def get_time():
     return datetime.datetime.today().strftime("%A, %d.%m.%Y")
 
-def get_horoscope(target="aries"):
+def get_horoscope(target="none"):
+    if target == "none":
+        return []
     try:
         data = requests.get(f"https://www.thevoicemag.ru/horoscope/daily/{target}")
         soup = BS(data.text, 'html.parser')
@@ -71,12 +84,15 @@ def get_horoscopies():
     return data
 
 def pretty_info():
-    finance = '\n'
-    weather = '\n'
+    finance = ''
+    weather_day = ''
+    weather_now = '\n'
 
     usd, eur = get_finance_rub()
     bitcoin = get_finance_bitcoin()
-    w_data = get_weather()
+    w_data = get_weather_to_day()
+    wn_data = get_weather_to_now()
+
     # h_data = utils.get_ipaddr()
     if not usd or not eur or not bitcoin:
         finance += "Невозможно получить данные о валютах ⚠️"
@@ -87,17 +103,23 @@ def pretty_info():
     if not holidays:
         holidays = ["Праздники не загружаются ⚠️", "Праздники не загружаются ⚠️"]
     if not w_data:
-        weather += "Невозможно загрузить погоду ⚠️"
+        weather_day += "Невозможно загрузить погоду ⚠️"
     else:
-        weather += f"*{w_data[0]}°C*\n_{w_data[-1]}_\n{w_data[1]}"
+        weather_day += f"Днем *{w_data[0]}°C*\n_{w_data[-1]}_\n{w_data[1]}"
+    
+    if not wn_data:
+        weather_now += "Невозможно загрузить погоду ⚠️"
+    else:
+        weather_now += f"Погода сейчас *{wn_data[0]}°C*"
 
     
 
-    buff = f"*Доброе утро!*\n"
-    buff += f'\n```\tСегодня {holidays[0]}\n\tЗавтра {holidays[-1]}```'
-    buff += finance + "\n"
-    buff += weather
-    buff += "\n\n_Ежедневный гороскоп_. Чтобы настроить /settings\n\t```{}```"
+    buff = f"""*Доброе утро!*
+```\tСегодня {holidays[0]}\n\tЗавтра {holidays[-1]}```
+{finance}
+{weather_now}, {weather_day}
+
+_Ежедневный гороскоп_. Чтобы настроить /settings""" + "\n\t{}"
     return buff
 
 def restore(backup, target):

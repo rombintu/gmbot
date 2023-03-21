@@ -16,13 +16,19 @@ store = Database(os.getenv("STORE", "sqlite:///store/db.sqlite"))
 @bot.message_handler(commands=['start', 'activate'])
 def handle_message_start(message):
     store.login(message.chat.id)
+    user = store.get_user(message.chat.id)
+    hrs = get_horoscope(user["horoscope"])
+    if not hrs:
+        hrs = "Гороскопы отключены"
+    else:
+        hrs = hrs[-1]
     bot.send_message(
         message.chat.id, 
         acivate_message
     )
     bot.send_message(
         message.chat.id, 
-        pretty_info(), 
+        pretty_info().format(hrs), 
         parse_mode="markdown"
     )
 
@@ -37,7 +43,11 @@ def handle_message_deactivate(message):
 @bot.message_handler(commands=['try'])
 def handle_message_try(message):
     user = store.get_user(message.chat.id)
-    hrs = get_horoscope(user["horoscope"])[-1]
+    hrs = get_horoscope(user["horoscope"])
+    if not hrs:
+        hrs = "Гороскопы отключены"
+    else:
+        hrs = hrs[-1]
     bot.send_message(
         message.chat.id, 
         pretty_info().format(hrs), 
@@ -56,6 +66,10 @@ def notify():
     users = store.get_users()
     mess = pretty_info()
     hrs = get_horoscopies()
+    if not hrs:
+        hrs = "Гороскопы отключены"
+    else:
+        hrs = hrs[-1]
     for u in users:
         try:
             bot.send_message(u["uuid"], mess.format(hrs[u["horoscope"]]), parse_mode="markdown")

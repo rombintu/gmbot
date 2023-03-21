@@ -7,6 +7,7 @@ acivate_message = """Добрый день!
 deactivate_message = "Вы отписались от рассылки. Вернуть: /activate"
 
 horoscopes = [
+    "none",
     "aries", # Oven
     "taurus", # Teletc
     "gemini", # Bliznecy
@@ -22,6 +23,7 @@ horoscopes = [
 ]
 
 horoscopes_pretty = [
+    "❌ Отключить",
     "♈️ Овен",
     "♉️ Телец",
     "♊️ Близнецы",
