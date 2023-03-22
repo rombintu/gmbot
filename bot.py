@@ -5,6 +5,7 @@ from telebot import TeleBot
 from telebot import types
 from content import acivate_message, deactivate_message
 from internal import kbs
+import utils
 from utils import pretty_info, get_horoscopies, get_horoscope
 from dotenv import load_dotenv
 load_dotenv()
@@ -17,18 +18,17 @@ store = Database(os.getenv("STORE", "sqlite:///store/db.sqlite"))
 def handle_message_start(message):
     store.login(message.chat.id)
     user = store.get_user(message.chat.id)
-    hrs = get_horoscope(user["horoscope"])
-    if not hrs:
-        hrs = "Гороскопы отключены"
-    else:
-        hrs = hrs[-1]
+    hrs = get_horoscopies()
+    hrs_user = "Гороскопы отключены"
+    if user["horoscope"] != "none":
+        hrs_user = hrs[user["horoscope"]]
     bot.send_message(
         message.chat.id, 
         acivate_message
     )
     bot.send_message(
         message.chat.id, 
-        pretty_info().format(hrs), 
+        pretty_info().format(hrs_user), 
         parse_mode="markdown"
     )
 
@@ -43,14 +43,13 @@ def handle_message_deactivate(message):
 @bot.message_handler(commands=['try'])
 def handle_message_try(message):
     user = store.get_user(message.chat.id)
-    hrs = get_horoscope(user["horoscope"])
-    if not hrs:
-        hrs = "Гороскопы отключены"
-    else:
-        hrs = hrs[-1]
+    hrs = get_horoscopies()
+    hrs_user = "Гороскопы отключены"
+    if user["horoscope"] != "none":
+        hrs_user = hrs[user["horoscope"]]
     bot.send_message(
         message.chat.id, 
-        pretty_info().format(hrs), 
+        pretty_info().format(hrs_user), 
         parse_mode="markdown"
     )
 
@@ -66,13 +65,12 @@ def notify():
     users = store.get_users()
     mess = pretty_info()
     hrs = get_horoscopies()
-    if not hrs:
-        hrs = "Гороскопы отключены"
-    else:
-        hrs = hrs[-1]
+    hrs_user = "Гороскопы отключены"
     for u in users:
         try:
-            bot.send_message(u["uuid"], mess.format(hrs[u["horoscope"]]), parse_mode="markdown")
+            if u["horoscope"] != "none":
+                hrs_user = hrs[u["horoscope"]]
+            bot.send_message(u["uuid"], mess.format(hrs_user), parse_mode="markdown")
         except Exception as err:
             print(err)
             store.delete_user(u)

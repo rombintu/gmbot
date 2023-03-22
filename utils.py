@@ -36,37 +36,65 @@ def get_holiday(tomorrow=False):
         print(err)
         return []
 
-def get_weather_to_day():
-    try:
-        data = requests.get("https://meteoinfo.ru/forecasts/russia/moscow-area/moscow")
-        soup = BS(data.text, 'html.parser')
-        ans = soup.find_all("tr")[6]
-        weather = ans.find_all("i")
-        w_value = weather[0].text
-        w_string = weather[1].text
-        w_winter = weather[-1].text
-        return [w_value, w_string, w_winter]
-    except Exception as err:
-        print(err)
-        return []
+# def get_weather_to_day():
+#     try:
+#         data = requests.get("https://meteoinfo.ru/forecasts/russia/moscow-area/moscow")
+#         soup = BS(data.text, 'html.parser')
+#         ans = soup.find_all("tr")[6]
+#         weather = ans.find_all("i")
+#         w_value = weather[0].text
+#         w_string = weather[1].text
+#         w_winter = weather[-1].text
+#         return [w_value, w_string, w_winter]
+#     except Exception as err:
+#         print(err)
+#         return []
     
-def get_weather_to_now():
+# def get_weather_to_now():
+#     try:
+#         data = requests.get("https://www.yandex.ru/pogoda/moscow?lat=55.755863&lon=37.6177")
+#         soup = BS(data.text, 'html.parser')
+#         # ans = soup.find("div", class_="fact card card_size_big")
+#         weather = soup.find("div", class_="temp fact__temp fact__temp_size_s").text
+#         return [weather]
+#     except Exception as err:
+#         print(err)
+#         return []
+def weather_org(weather: str):
+    w = weather.split(";")
+    try:    
+        w.remove("…")
+        w.pop(0)
+    except: pass
+
     try:
-        data = requests.get("https://www.yandex.ru/pogoda/moscow?lat=55.755863&lon=37.6177")
-        soup = BS(data.text, 'html.parser')
-        ans = soup.find("div", class_="fact card card_size_big")
-        weather = ans.find("div", class_="temp fact__temp fact__temp_size_s").text
-        return [weather]
+        return [w[1], w[3], w[5], w[-1]]
     except Exception as err:
         print(err)
         return []
+
+def get_weather_yandex():
+    try:
+        data = requests.get("https://www.yandex.ru/pogoda/details/10-day-weather?lat=55.755863&lon=37.6177&via=mf")
+        soup = BS(data.text, 'html.parser')
+        ans = soup.find("table", class_="weather-table")
+        tbody = ans.find_all("tr", class_="weather-table__row")
+        meta = ["morning", "day", "evening", "night"]
+        parsing_data = {}
+        for row, met in zip(tbody, meta):
+            parsing_data[met] = weather_org(row.getText(separator=";"))
+        return parsing_data
+    except Exception as err:
+        print(err)
+        return {}
+    
 
 def get_time():
     return datetime.datetime.today().strftime("%A, %d.%m.%Y")
 
-def get_horoscope(target="none"):
+def get_horoscope(target="aries"):
     if target == "none":
-        return []
+        return [0, 0]
     try:
         data = requests.get(f"https://www.thevoicemag.ru/horoscope/daily/{target}")
         soup = BS(data.text, 'html.parser')
@@ -74,25 +102,28 @@ def get_horoscope(target="none"):
         return [target, ans.text]
     except Exception as err:
         print(err)
-        return []
+        return [0, 0]
 
 def get_horoscopies():
     data = {}
     for hrs in horoscopes:
         key, val = get_horoscope(hrs)
+        if key == 0 or val == 0:
+            continue
         data[key] = val
     return data
 
 def pretty_info():
     finance = ''
-    weather_day = ''
-    weather_now = '\n'
-
+    # weather_day = ''
+    # weather_now = '\n'
+    weather = ''
     usd, eur = get_finance_rub()
     bitcoin = get_finance_bitcoin()
-    w_data = get_weather_to_day()
-    wn_data = get_weather_to_now()
-
+    w_data = get_weather_yandex()
+    # TRY MORE
+    if not w_data:
+        w_data = get_weather_yandex()
     # h_data = utils.get_ipaddr()
     if not usd or not eur or not bitcoin:
         finance += "Невозможно получить данные о валютах ⚠️"
@@ -101,24 +132,29 @@ def pretty_info():
 
     holidays = get_holiday()
     if not holidays:
-        holidays = ["Праздники не загружаются ⚠️", "Праздники не загружаются ⚠️"]
-    if not w_data:
-        weather_day += "Невозможно загрузить погоду ⚠️"
-    else:
-        weather_day += f"Днем *{w_data[0]}°C*\n_{w_data[-1]}_\n{w_data[1]}"
+        holidays = ["Праздники на сегодня не загрузились ⚠️", "Праздники завтра не загрузились ⚠️"]
+    # if not w_data:
+    #     weather_day += "Невозможно загрузить дневную погоду ⚠️"
+    # else:
+    #     weather_day += f"Днем *{w_data[0]}°C*\n_{w_data[-1]}_\n{w_data[1]}"
     
-    if not wn_data:
-        weather_now += "Невозможно загрузить погоду ⚠️"
+    if not w_data:
+        weather += "Невозможно загрузить погоду ⚠️"
     else:
-        weather_now += f"Погода сейчас *{wn_data[0]}°C*"
+        weather += f"""
+        Яндекс.Погода
+Утром *{w_data['morning'][0]} ({w_data['morning'][-1]})C* _{w_data['morning'][1]}_ Влажность: {w_data['morning'][2]}
+Днем *{w_data['day'][0]} ({w_data['day'][-1]})C* _{w_data['day'][1]}_ Влажность: {w_data['day'][2]}
+Вечером *{w_data['evening'][0]} ({w_data['evening'][-1]})C* _{w_data['evening'][1]}_ Влажность: {w_data['evening'][2]}
+Ночью *{w_data['night'][0]} ({w_data['night'][-1]})C* _{w_data['night'][1]}_ Влажность: {w_data['night'][2]}
+"""
 
     
 
     buff = f"""*Доброе утро!*
 ```\tСегодня {holidays[0]}\n\tЗавтра {holidays[-1]}```
 {finance}
-{weather_now}, {weather_day}
-
+{weather}
 _Ежедневный гороскоп_. Чтобы настроить /settings""" + "\n\t{}"
     return buff
 
