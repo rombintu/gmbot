@@ -13,22 +13,25 @@ load_dotenv()
 bot = TeleBot(os.getenv("TOKEN"), parse_mode=None)
 store = Database(os.getenv("STORE", "sqlite:///store/db.sqlite"))
 
+def get_format_message(user, mess):
+    hrs = get_horoscopies()
+    hrs_user = "Гороскопы отключены"
+    if user["horoscope"] != "none":
+        hrs_user = hrs[user["horoscope"]]
+    return mess.format(hrs_user)
 
 @bot.message_handler(commands=['start', 'activate'])
 def handle_message_start(message):
     store.login(message.chat.id)
     user = store.get_user(message.chat.id)
-    hrs = get_horoscopies()
-    hrs_user = "Гороскопы отключены"
-    if user["horoscope"] != "none":
-        hrs_user = hrs[user["horoscope"]]
+    mess = pretty_info()
     bot.send_message(
         message.chat.id, 
         acivate_message
     )
     bot.send_message(
         message.chat.id, 
-        pretty_info().format(hrs_user), 
+        get_format_message(user, mess), 
         parse_mode="markdown"
     )
 
@@ -43,13 +46,10 @@ def handle_message_deactivate(message):
 @bot.message_handler(commands=['try'])
 def handle_message_try(message):
     user = store.get_user(message.chat.id)
-    hrs = get_horoscopies()
-    hrs_user = "Гороскопы отключены"
-    if user["horoscope"] != "none":
-        hrs_user = hrs[user["horoscope"]]
+    mess = pretty_info()
     bot.send_message(
         message.chat.id, 
-        pretty_info().format(hrs_user), 
+        get_format_message(user, mess), 
         parse_mode="markdown"
     )
 
@@ -64,13 +64,9 @@ def handle_message_settings(message):
 def notify():
     users = store.get_users()
     mess = pretty_info()
-    hrs = get_horoscopies()
-    hrs_user = "Гороскопы отключены"
     for u in users:
         try:
-            if u["horoscope"] != "none":
-                hrs_user = hrs[u["horoscope"]]
-            bot.send_message(u["uuid"], mess.format(hrs_user), parse_mode="markdown")
+            bot.send_message(u["uuid"], get_format_message(u, mess), parse_mode="markdown")
         except Exception as err:
             print(err)
             store.delete_user(u)
