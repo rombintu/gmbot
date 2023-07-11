@@ -66,7 +66,7 @@ def notify():
     mess = pretty_info()
     for u in users:
         try:
-            bot.send_message(u["uuid"], get_format_message(u, mess), parse_mode="markdown")
+            bot.send_message(u["uuid"], get_format_message(u, mess), parse_mode="markdown", disable_web_page_preview=True)
         except Exception as err:
             print(err)
             store.delete_user(u)

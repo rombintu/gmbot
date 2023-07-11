@@ -93,7 +93,7 @@ def get_weather_meteoservice_ru():
     data = requests.get(url)
     soup = BS(data.text, "html.parser")
     text = soup.find("strong").text
-    return text + f"\n[Погода]({url})"
+    return text + f"\n[Метеосервис.ру Москва]({url})"
 
 def get_time():
     return datetime.datetime.today().strftime("%A, %d.%m.%Y")
@@ -151,7 +151,9 @@ def pretty_info():
     buff = f"""*Доброе утро!*
 ```\tСегодня {holidays[0]}\n\tЗавтра {holidays[-1]}```
 {finance}
+
 {weather}
+
 _Ежедневный гороскоп_. Чтобы настроить /settings""" + "\n\t{}"
     return buff
 
