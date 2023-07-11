@@ -1,9 +1,15 @@
-from utils import get_holiday, get_weather
-import sys
-from bot import store
+import unittest
+from utils import get_weather_meteoservice_ru, pretty_info
 
-if __name__ == "__main__":
-    users = store.get_users()
-    for u in users:
-        print(u)
-    
+class TestFunctions(unittest.TestCase):
+
+    def test_weather(self):
+        weather = get_weather_meteoservice_ru()
+        print(weather)
+
+    def test_pretty_info(self):
+        buff = pretty_info()
+        print(buff)
+
+if __name__ == '__main__':
+    unittest.main()

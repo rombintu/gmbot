@@ -87,7 +87,13 @@ def get_weather_yandex():
     except Exception as err:
         print(err)
         return {}
-    
+
+def get_weather_meteoservice_ru():
+    url = "https://www.meteoservice.ru/weather/today/moskva"
+    data = requests.get(url)
+    soup = BS(data.text, "html.parser")
+    text = soup.find("strong").text
+    return text + f"\n[Погода]({url})"
 
 def get_time():
     return datetime.datetime.today().strftime("%A, %d.%m.%Y")
@@ -120,10 +126,10 @@ def pretty_info():
     weather = ''
     usd, eur = get_finance_rub()
     bitcoin = get_finance_bitcoin()
-    w_data = get_weather_yandex()
+    w_data = get_weather_meteoservice_ru()
     # TRY MORE
     if not w_data:
-        w_data = get_weather_yandex()
+        w_data = get_weather_meteoservice_ru()
     # h_data = utils.get_ipaddr()
     if not usd or not eur or not bitcoin:
         finance += "Невозможно получить данные о валютах ⚠️"
@@ -141,16 +147,7 @@ def pretty_info():
     if not w_data:
         weather += "Невозможно загрузить погоду ⚠️"
     else:
-        weather += f"""
-        Яндекс.Погода
-Утром *{w_data['morning'][0]} ({w_data['morning'][-1]})C* _{w_data['morning'][1]}_ Влажность: {w_data['morning'][2]}
-Днем *{w_data['day'][0]} ({w_data['day'][-1]})C* _{w_data['day'][1]}_ Влажность: {w_data['day'][2]}
-Вечером *{w_data['evening'][0]} ({w_data['evening'][-1]})C* _{w_data['evening'][1]}_ Влажность: {w_data['evening'][2]}
-Ночью *{w_data['night'][0]} ({w_data['night'][-1]})C* _{w_data['night'][1]}_ Влажность: {w_data['night'][2]}
-"""
-
-    
-
+        weather = w_data
     buff = f"""*Доброе утро!*
 ```\tСегодня {holidays[0]}\n\tЗавтра {holidays[-1]}```
 {finance}
