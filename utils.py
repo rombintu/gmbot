@@ -155,7 +155,7 @@ def pretty_info():
     if not usd or not eur or not bitcoin:
         finance += "Невозможно получить данные о валютах ⚠️"
     else:
-        finance += f"\n_{round(usd, 2)}$ | {round(eur, 2)}€ | {bitcoin:,}₿_"
+        finance += f"\n_{round(usd, 2)} 💵 {round(eur, 2)} 💶 {bitcoin:,} 💎_"
 
     holidays = get_holiday()[0]
     if not holidays:
