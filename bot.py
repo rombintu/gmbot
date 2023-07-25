@@ -5,8 +5,8 @@ from telebot import TeleBot
 from telebot import types
 from content import acivate_message, deactivate_message
 from internal import kbs
-import utils
-from utils import pretty_info, get_horoscopies, get_horoscope
+
+from utils import pretty_info, get_horoscopies
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -49,7 +49,7 @@ def handle_message_try(message):
     mess = pretty_info()
     bot.send_message(
         message.chat.id, 
-        get_format_message(user, mess), 
+        get_format_message(user, mess), disable_web_page_preview=True, 
         parse_mode="markdown"
     )
 

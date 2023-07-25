@@ -119,6 +119,27 @@ def get_horoscopies():
         data[key] = val
     return data
 
+class Weather:
+    def __init__(self, title, emoji):
+        self.title = title
+        self.emoji = emoji
+
+weathers = [
+    Weather("ясн", "☀️"),
+    Weather("облачн", "⛅️"),
+    Weather("дожд", "🌧"),
+    Weather("гроз", "⛈"),
+    Weather("снег", "🌨")
+]
+
+def get_emoji_by_weather(weather: str):
+    w = weather.lower()
+    emoji = "🌸"
+    for ws in weathers:
+        if ws.title in w:
+            emoji = ws.emoji
+    return emoji
+
 def pretty_info():
     finance = ''
     # weather_day = ''
@@ -136,9 +157,9 @@ def pretty_info():
     else:
         finance += f"\n_{round(usd, 2)}$ | {round(eur, 2)}€ | {bitcoin:,}₿_"
 
-    holidays = get_holiday()
+    holidays = get_holiday()[0]
     if not holidays:
-        holidays = ["Праздники на сегодня не загрузились ⚠️", "Праздники завтра не загрузились ⚠️"]
+        holidays = "Праздники на сегодня не загрузились ⚠️"
     # if not w_data:
     #     weather_day += "Невозможно загрузить дневную погоду ⚠️"
     # else:
@@ -147,12 +168,13 @@ def pretty_info():
     if not w_data:
         weather += "Невозможно загрузить погоду ⚠️"
     else:
+        emoji = get_emoji_by_weather(w_data)
         weather = w_data
-    buff = f"""*Доброе утро!*
-```\tСегодня {holidays[0]}\n\tЗавтра {holidays[-1]}```
-{finance}
+    buff = f"""*Доброе утро!* ☀️
+```\tСегодня {holidays}```
+\t{finance}
 
-{weather}
+\t{emoji} {weather}
 
 _Ежедневный гороскоп_. Чтобы настроить /settings""" + "\n\t{}"
     return buff
