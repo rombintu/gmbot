@@ -36,64 +36,16 @@ def get_holiday(tomorrow=False):
         print(err)
         return []
 
-# def get_weather_to_day():
-#     try:
-#         data = requests.get("https://meteoinfo.ru/forecasts/russia/moscow-area/moscow")
-#         soup = BS(data.text, 'html.parser')
-#         ans = soup.find_all("tr")[6]
-#         weather = ans.find_all("i")
-#         w_value = weather[0].text
-#         w_string = weather[1].text
-#         w_winter = weather[-1].text
-#         return [w_value, w_string, w_winter]
-#     except Exception as err:
-#         print(err)
-#         return []
-    
-# def get_weather_to_now():
-#     try:
-#         data = requests.get("https://www.yandex.ru/pogoda/moscow?lat=55.755863&lon=37.6177")
-#         soup = BS(data.text, 'html.parser')
-#         # ans = soup.find("div", class_="fact card card_size_big")
-#         weather = soup.find("div", class_="temp fact__temp fact__temp_size_s").text
-#         return [weather]
-#     except Exception as err:
-#         print(err)
-#         return []
-def weather_org(weather: str):
-    w = weather.split(";")
-    try:    
-        w.remove("…")
-        w.pop(0)
-    except: pass
-
+def get_weather_meteoservice_ru(sity="moskva"):
+    url = f"https://www.meteoservice.ru/weather/today/{sity}"
+    text = ""
     try:
-        return [w[1], w[3], w[5], w[-1]]
-    except Exception as err:
-        print(err)
-        return []
-
-def get_weather_yandex():
-    try:
-        data = requests.get("https://www.yandex.ru/pogoda/details/10-day-weather?lat=55.755863&lon=37.6177&via=mf")
-        soup = BS(data.text, 'html.parser')
-        ans = soup.find("table", class_="weather-table")
-        tbody = ans.find_all("tr", class_="weather-table__row")
-        meta = ["morning", "day", "evening", "night"]
-        parsing_data = {}
-        for row, met in zip(tbody, meta):
-            parsing_data[met] = weather_org(row.getText(separator=";"))
-        return parsing_data
-    except Exception as err:
-        print(err)
-        return {}
-
-def get_weather_meteoservice_ru():
-    url = "https://www.meteoservice.ru/weather/today/moskva"
-    data = requests.get(url)
-    soup = BS(data.text, "html.parser")
-    text = soup.find("strong").text
-    return text + f"\n[Метеосервис.ру Москва]({url})"
+        data = requests.get(url)
+        soup = BS(data.text, "html.parser")
+        text = soup.find("strong").text
+        return text + f"\n[Метеосервис.ру {sity.upper()}]({url})"
+    except Exception:
+        return text
 
 def get_time():
     return datetime.datetime.today().strftime("%A, %d.%m.%Y")
@@ -160,11 +112,7 @@ def pretty_info():
     holidays = get_holiday()[0]
     if not holidays:
         holidays = "Праздники на сегодня не загрузились ⚠️"
-    # if not w_data:
-    #     weather_day += "Невозможно загрузить дневную погоду ⚠️"
-    # else:
-    #     weather_day += f"Днем *{w_data[0]}°C*\n_{w_data[-1]}_\n{w_data[1]}"
-    
+    emoji = ""
     if not w_data:
         weather += "Невозможно загрузить погоду ⚠️"
     else:
@@ -176,7 +124,7 @@ def pretty_info():
 
 \t{emoji} {weather}
 
-_Ежедневный гороскоп_. Чтобы настроить /settings""" + "\n\t{}"
+_Ежедневный гороскоп_""" + "\n\t{}"
     return buff
 
 def restore(backup, target):
