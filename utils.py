@@ -1,12 +1,13 @@
 import requests
 import datetime
 import locale
-from store.store import Database
+from internal.store import Database
 
 from bs4 import BeautifulSoup as BS
-from content import horoscopes
+from content import horoscopes, cities
 
 locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
+
 
 def get_finance_rub():
     try:
@@ -36,14 +37,15 @@ def get_holiday(tomorrow=False):
         print(err)
         return []
 
-def get_weather_meteoservice_ru(sity="moskva"):
-    url = f"https://www.meteoservice.ru/weather/today/{sity}"
+def get_weather_meteoservice_ru(city="msk"):
+    user_city = cities.get(city)
+    url = f"https://www.meteoservice.ru/weather/today/{user_city.get('val')}"
     text = ""
     try:
         data = requests.get(url)
         soup = BS(data.text, "html.parser")
         text = soup.find("strong").text
-        return text + f"\n[Метеосервис.ру {sity.upper()}]({url})"
+        return text + f"\n[Метеосервис.ру {user_city.get('ru')}]({url})"
     except Exception:
         return text
 
@@ -86,23 +88,23 @@ weathers = [
 
 def get_emoji_by_weather(weather: str):
     w = weather.lower()
-    emoji = "🌸"
+    emoji = "☁️"
     for ws in weathers:
         if ws.title in w:
             emoji = ws.emoji
     return emoji
 
-def pretty_info():
+def pretty_info(city="msk"):
     finance = ''
     # weather_day = ''
     # weather_now = '\n'
     weather = ''
     usd, eur = get_finance_rub()
     bitcoin = get_finance_bitcoin()
-    w_data = get_weather_meteoservice_ru()
+    w_data = get_weather_meteoservice_ru(city)
     # TRY MORE
     if not w_data:
-        w_data = get_weather_meteoservice_ru()
+        w_data = get_weather_meteoservice_ru(city)
     # h_data = utils.get_ipaddr()
     if not usd or not eur or not bitcoin:
         finance += "Невозможно получить данные о валютах ⚠️"

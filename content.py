@@ -37,3 +37,19 @@ horoscopes_pretty = [
     "♒️ Водолей",
     "♓️ Рыбы",
 ]
+
+cities = {
+    "msk": {"val": "moskva", "ru": "Москва, Россия"},
+    "spb": {"val": "sankt-peterburg", "ru": "Санкт-Петербург, Россия"},
+    "nvb": {"val": "novosibirsk", "ru": "Новосибирск, Россия"},
+    "ekt": {"val": "ekaterinburg", "ru": "Екатеринбург, Россия"},
+    "niz": {"val": "nizhniy-novgorod", "ru": "Нижний Новгород, Россия"},
+    "smr": {"val": "samara", "ru": "Самара, Россия"},
+    "oms": {"val": "omsk", "ru": "Омск, Россия"},
+    "kaz": {"val": "kazan", "ru": "Казань, Россия"},
+    "rov": {"val": "rostov-na-donu", "ru": "Ростов-на-Дону, Россия"},
+    "chl": {"val": "chelyabinsk", "ru": "Челбинск, Россия"},
+    "sch": {"val": "sochi", "ru": "Сочи, Россия"},
+    "evn": {"val": "erevan", "ru": "Ереван, Армения"},
+    "tbs": {"val": "tbilisi", "ru": "Тбилиси, Грузия"}
+}
