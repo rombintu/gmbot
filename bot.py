@@ -37,10 +37,10 @@ def get_format_message(user, mess):
 async def handle_message_start(message: types.Message):
     db.login(message.chat.id)
     user = db.get_user(message.chat.id)
-    mess = pretty_info(city=user.get('city'))
     await message.answer(
         acivate_message,
     )
+    mess = pretty_info(city=user.city)
     await message.answer(
         get_format_message(user, mess), 
         parse_mode="markdown",
@@ -73,10 +73,12 @@ async def notify():
     users = db.get_users()
     mess = pretty_info()
     for u in users:
+        if u.city not in ["msk", None]:
+            mess = pretty_info(city=u.city)
         try:
             await bot.send_message(u.uuid, get_format_message(u, mess), parse_mode="markdown")
         except Exception as err:
-            print(err)
+            logger.error(err)
             await db.delete_user(u)
 
 async def send_all(message: types.Message):
@@ -85,7 +87,7 @@ async def send_all(message: types.Message):
         try:
             await bot.send_message(u.uuid, message, parse_mode="markdown")
         except Exception as err:
-            print(err)
+            logger.error(err)
 
 @dp.callback_query(F.data.startswith("settings_"))
 async def callbacks(c: types.CallbackQuery):

@@ -24,7 +24,6 @@ async def scheduler():
         await asyncio.sleep(1)
 
 def handle_sigint():
-    stop_bot()
     logger.info("Received SIGINT signal. Cancelling all tasks...")
     for task in asyncio.all_tasks():
         task.cancel()
@@ -44,6 +43,6 @@ async def main():
 # TODO
 if __name__ == "__main__":
     logger.info("Service is starting...")
-    signal.signal(signal.SIGINT, lambda s, f: asyncio.create_task(handle_sigint()))
+    signal.signal(signal.SIGINT, lambda s, f: asyncio.create_task(handle_sigint(), stop_bot()))
     asyncio.run(main())
     
