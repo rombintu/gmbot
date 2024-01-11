@@ -8,7 +8,7 @@ from content import acivate_message, deactivate_message
 from internal import kbs
 from internal import db, logger
 
-from utils import pretty_info, get_horoscopies, notify_enable
+from utils import pretty_info, get_horoscopies, notify_enable, get_current_time, get_time_by_notify
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -73,6 +73,8 @@ async def notify():
     users = db.get_users()
     mess = pretty_info()
     for u in users:
+        if get_current_time() not in get_time_by_notify(u.notify):
+            continue
         if u.city not in ["msk", None]:
             mess = pretty_info(city=u.city)
         try:

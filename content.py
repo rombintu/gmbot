@@ -59,3 +59,9 @@ notify_timers = {
     2: {"val": "daytime", "ru": "Днем (12:00)"},
     4: {"val": "evening", "ru": "Вечером (18:00)"}
 }
+
+notify_timers_values = {
+    1: "07:00",
+    2: "12:00",
+    4: "18:00",
+}

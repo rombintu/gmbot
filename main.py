@@ -1,18 +1,12 @@
-from bot import start_bot, stop_bot, notify
+import functools
 import aioschedule
 import asyncio
-from internal import logger
 import signal
 import sys
-import functools
 
-time_for_scheduler = "07:00"
-
-
-# def handle_exit():
-#     logger.info("Received SIGINT signal. Cancelling all tasks...")
-#     for task in asyncio.all_tasks():
-#         task.cancel()
+from internal import logger
+from content import notify_timers_values
+from bot import start_bot, notify, db
 
 def exit(signame, loop):
     logger.warning(f'Received {signame} signal. Cancelling all tasks...')
@@ -30,7 +24,8 @@ async def run_bot():
 
 # TODO scheduler
 async def scheduler():
-    aioschedule.every().day.at(time_for_scheduler).do(notify)
+    for ntv in notify_timers_values.values():
+        aioschedule.every().day.at(ntv).do(notify)
     # aioschedule.every().minute.do(notify) # DEV
     logger.info("Scheduler is starting...")
     while True:
@@ -64,13 +59,6 @@ async def main():
 # TODO
 if __name__ == "__main__":
     logger.info("Service is starting...")
-    # signal.signal(signal.SIGINT, lambda s, f: asyncio.create_task(handle_exit()))
-    # signal.signal(signal.SIGTERM, lambda s, f: asyncio.create_task(handle_exit()))
-    
-    # loop = asyncio.get_event_loop()
-    # try:
     asyncio.run(main())
-    #     loop.run_until_complete(main())
-    # finally:
-    #     loop.close()
-    
+
+

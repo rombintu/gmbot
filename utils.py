@@ -5,6 +5,7 @@ from internal.store import Database
 from internal import logger
 from bs4 import BeautifulSoup as BS
 from content import horoscopes, cities
+from content import notify_timers_values as ntv_d
 
 locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
 
@@ -120,7 +121,7 @@ def pretty_info(city="msk"):
     else:
         emoji = get_emoji_by_weather(w_data)
         weather = w_data
-    buff = f"""*Доброе утро!* ☀️
+    buff = f"""*Добрый день!* ☀️
 ```\tСегодня {holidays}```
 \t{finance}
 
@@ -146,9 +147,9 @@ def set_notify_all_users(engine: str):
 
 # notify value: 1, 2, 4
 def get_time_by_notify(notify: int):
-    morning = "07:00"
-    daytime = "12:00"
-    evening = "18:00"
+    morning = ntv_d.get(1)
+    daytime = ntv_d.get(2)
+    evening = ntv_d.get(4)
     targets = {
         1: [morning],
         2: [daytime],
@@ -223,3 +224,6 @@ def notify_enable(user_notify: int, target: int, switch: str):
         if targets.get(target):
             targets[target] = False
     return new_notify_number(targets)
+
+def get_current_time():
+    return datetime.datetime.now().strftime("%H:%M")
