@@ -18,7 +18,8 @@ Users = Table(
     Column("uuid", Integer, unique=True),
     Column("activate", Boolean),
     Column("horoscope", String, default="none"),
-    Column("city", String),
+    Column("city", String, default="msk", server_default="msk"),
+    Column("notify", Integer, default=1, server_default="1", nullable=False) # 1 - утро, 2 - день, 4 - вечер
 )
 
 class User(Base):
@@ -94,6 +95,15 @@ class Database:
         with self.engine.connect() as c:
             with c.begin():
                 update_user = update(User).where(User.uuid == uuid).values(city=city)
+                try:
+                    c.execute(update_user)
+                except Exception as err:
+                    logger.error(err)
+
+    def user_update_notify(self, uuid, value):
+        with self.engine.connect() as c:
+            with c.begin():
+                update_user = update(User).where(User.uuid == uuid).values(notify=value)
                 try:
                     c.execute(update_user)
                 except Exception as err:

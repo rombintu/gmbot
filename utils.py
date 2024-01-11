@@ -2,7 +2,7 @@ import requests
 import datetime
 import locale
 from internal.store import Database
-
+from internal import logger
 from bs4 import BeautifulSoup as BS
 from content import horoscopes, cities
 
@@ -126,7 +126,7 @@ def pretty_info(city="msk"):
 
 \t{emoji} {weather}
 
-_Ежедневный гороскоп_""" + "\n\t{}"
+_Ежедневный гороскоп_""" + "\n\t{}\n\n/settings - Настрой бота под себя"
     return buff
 
 def restore(backup, target):
@@ -135,4 +135,91 @@ def restore(backup, target):
     users = backup_db.get_users_uuids()
     for u in users:
         target_db.login(u[0])
-        print(f"User: {u[0]} - restore")
+        logger.info(f"User: {u[0]} - restore")
+
+def set_notify_all_users(engine: str):
+    db = Database(engine)
+    users = db.get_users()
+    for u in users:
+        db.user_update_notify(u[0], 1)
+        logger.debug(f"User: {u[0]} set notify on morning")
+
+# notify value: 1, 2, 4
+def get_time_by_notify(notify: int):
+    morning = "07:00"
+    daytime = "12:00"
+    evening = "18:00"
+    targets = {
+        1: [morning],
+        2: [daytime],
+        3: [morning, daytime],
+        4: [evening],
+        5: [morning, evening],
+        6: [daytime, evening],
+        7: [morning, daytime, evening]
+    }
+    return targets.get(notify)
+
+def get_timestr_by_notify(notify: int):
+    morning = "morning"
+    daytime = "daytime"
+    evening = "evening"
+    targets = {
+        1: [morning],
+        2: [daytime],
+        3: [morning, daytime],
+        4: [evening],
+        5: [morning, evening],
+        6: [daytime, evening],
+        7: [morning, daytime, evening]
+    }
+    return targets.get(notify)
+
+def notify_is_enable(user_time: int, time_str: str):
+    if time_str in get_timestr_by_notify(user_time):
+        return True
+    return False
+
+def notify_from_number(user_notify: int):
+    targets = {
+        1: False,
+        2: False,
+        4: False,
+    }
+    match user_notify:
+        case 1:
+            targets[1] = True
+        case 2: 
+            targets[2] = True
+        case 3:
+            targets[1] = True
+            targets[2] = True
+        case 4:
+            targets[4] = True
+        case 5:
+            targets[1] = True
+            targets[4] = True
+        case 6:
+            targets[2] = True
+            targets[4] = True
+        case 7:
+            targets[1] = True
+            targets[2] = True
+            targets[4] = True
+    return targets
+
+def new_notify_number(targets: dict):
+    summa = 0
+    for t, enable in targets.items():
+        if enable: summa += t
+    return summa
+
+def notify_enable(user_notify: int, target: int, switch: str):
+    targets = notify_from_number(user_notify)
+    if switch == "enable":
+        if not targets.get(target):
+            targets[target] = True
+    else:
+        if targets.get(target):
+            targets[target] = False
+    return new_notify_number(targets)
