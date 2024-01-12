@@ -1,9 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup as ikm
 from aiogram.types import InlineKeyboardButton as btn
 from aiogram.utils.keyboard import InlineKeyboardBuilder as ikbuilder
-from content import horoscopes, horoscopes_pretty, cities, notify_timers
-from .store import User, logger
-from utils import notify_is_enable
+from internal.content import horoscopes, horoscopes_pretty, cities, notify_timers
+from internal.utils import notify_is_enable
 
 horoscope = {}
 
@@ -16,20 +15,22 @@ def settings():
     ]])
     return k
 
-def settings_horoscope():
+def settings_horoscope(user_horoscope):
     builder = ikbuilder()
     for text, call in zip(horoscopes_pretty, horoscopes, strict=True):
-        builder.button(text=text, callback_data=f"settings_horoscope_{call}")
+        smile = " ✅" if user_horoscope == call else ""
+        builder.button(text=f"{text}{smile}", callback_data=f"settings_horoscope_{call}")
     builder.adjust(3, 3)
-    builder.button(text="↩️ Вернуться", callback_data=f"settings_back")
+    builder.row(btn(text="↩️ Вернуться", callback_data=f"settings_back"))
     return builder.as_markup()
 
-def settings_city():
+def settings_city(user_city: str):
     builder = ikbuilder()
     for key, city in cities.items():
-        builder.button(text=city.get("ru"), callback_data=f"settings_city_{key}")
+        smile = "✅ " if user_city == key else ""
+        builder.button(text=f'{smile}{city.get("ru")}', callback_data=f"settings_city_{key}")
     builder.adjust(2, 2)
-    builder.button(text="↩️ Вернуться", callback_data=f"settings_back")
+    builder.row(btn(text="↩️ Вернуться", callback_data=f"settings_back"))
     return builder.as_markup()
 
 def settings_notify(user_notify: int):
@@ -37,11 +38,11 @@ def settings_notify(user_notify: int):
     for key, time in notify_timers.items():
         smile = "🚫"
         switch = "enable"
-        if notify_is_enable(user_time=user_notify, time_str=time.get('val')): 
+        if notify_is_enable(user_time=user_notify, time_str=time.get('en')): 
             smile = "✅"
             switch = "disable"
-        builder.button(text=f"{smile} {time.get('ru')}", callback_data=f"settings_notify_{key}_{switch}")
-    builder.adjust(1, repeat=False)   
-    builder.button(text="↩️ Вернуться", callback_data=f"settings_back")
+        builder.row(btn(text=f"{smile} {time.get('ru')}", callback_data=f"settings_notify_{key}_{switch}"))
+    builder.adjust(1)   
+    builder.row(btn(text="↩️ Вернуться", callback_data=f"settings_back"))
     return builder.as_markup()
 

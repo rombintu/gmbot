@@ -5,8 +5,8 @@ import signal
 import sys
 
 from internal import logger
-from content import notify_timers_values
-from bot import start_bot, notify, db
+from internal.content import notify_timers
+from internal import start_bot, notify
 
 def exit(signame, loop):
     logger.warning(f'Received {signame} signal. Cancelling all tasks...')
@@ -24,8 +24,9 @@ async def run_bot():
 
 # TODO scheduler
 async def scheduler():
-    for ntv in notify_timers_values.values():
-        aioschedule.every().day.at(ntv).do(notify)
+    # for ntv in notify_timers.values():
+        # aioschedule.every().day.at(ntv.get("val").strftime("%H:%M")).do(notify)
+    aioschedule.every().hour.at(":00").do(notify)
     # aioschedule.every().minute.do(notify) # DEV
     logger.info("Scheduler is starting...")
     while True:
