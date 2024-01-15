@@ -1,15 +1,16 @@
 import os
 from datetime import timedelta
 from aiogram import Bot, Dispatcher, types, F
-# from aiogram.fsm.context import FSMContext
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
 from aiogram.filters.command import Command
-
+# from aiogram.filters import Filter
 from internal.content import acivate_message, deactivate_message
 from internal import kbs
 from internal import Database, logger
 
 from internal.utils import pretty_info, get_horoscopies, notify_enable, get_current_time, get_time_by_notify
-from internal.utils import cities
+# from internal.utils import cities
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -17,15 +18,17 @@ bot = Bot(os.getenv("TOKEN"), parse_mode=None, disable_web_page_preview=True)
 dp = Dispatcher()
 # dp.include_routers(user.router, different_types.router)
 db = Database(os.getenv("STORE", "sqlite:///db.sqlite"))
+ADMIN_ID = 469973030
+
 # Запуск бота
 async def start_bot():
     logger.info("Bot is starting...")
     await dp.start_polling(bot)
 
-# Остановка бота
-async def stop_bot():
-    logger.info("Bot is stopping...")
-    await dp.stop_polling()
+# # Остановка бота
+# async def stop_bot():
+#     logger.info("Bot is stopping...")
+#     await dp.stop_polling()
 
 def get_format_message(user, mess):
     hrs = get_horoscopies()
@@ -49,7 +52,7 @@ async def handle_message_start(message: types.Message):
 
 @dp.message(Command('deactivate'))
 async def handle_message_deactivate(message: types.Message):
-    await db.deactivate(message.chat.id)
+    db.deactivate(message.chat.id)
     await message.answer(
         deactivate_message
     )
@@ -92,13 +95,27 @@ async def notify():
         # else:
         #     logger.debug(f"Skip user for notify: {u.uuid}")
 
-async def send_all(message: types.Message):
+class Form(StatesGroup):
+    content = State()
+
+@dp.message((F.text == '/send') & (F.from_user.id == ADMIN_ID))
+async def handler_send_all(message: types.Message, state: FSMContext):
+    await state.set_state(Form.content)
+    await message.answer("Введи, что отправить всем")
+
+@dp.message(Form.content)
+async def send_content(message: types.Message, state: FSMContext):
+    content = await state.update_data(content=message.text)
+    await state.clear()
+    errors = []
     users = db.get_users()
     for u in users:
         try:
-            await bot.send_message(u.uuid, message, parse_mode="markdown")
+            await bot.send_message(u.uuid, content.get("content"), parse_mode="markdown")
         except Exception as err:
-            logger.error(err)
+            logger.warning(err)
+            errors.append(f"{u.uuid}: {err}\n")
+    await message.answer(f"Готово. \nWARNS: {[err for err in errors]}")
 
 @dp.callback_query(F.data.startswith("settings_"))
 async def callbacks(c: types.CallbackQuery):

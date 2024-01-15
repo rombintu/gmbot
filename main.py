@@ -5,7 +5,7 @@ import signal
 import sys
 
 from internal import logger
-from internal.content import notify_timers
+# from internal.content import notify_timers
 from internal import start_bot, notify
 
 def exit(signame, loop):
