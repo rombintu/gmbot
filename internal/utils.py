@@ -68,6 +68,10 @@ def get_horoscope(target="aries"):
         print(err)
         return [0, 0]
 
+# TODO
+def get_news():
+    ...
+
 def get_horoscopies():
     data = {}
     for hrs in horoscopes:

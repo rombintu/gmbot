@@ -81,7 +81,7 @@ async def notify():
         for tbn in notify_list:
             if tbn <= get_current_time(u.city) <= (tbn + timedelta(minutes=5)):
                 skip = False
-        if skip:
+        if not skip:
             if u.city not in ["msk", None]:
                 mess = pretty_info(city=u.city)
             try:
