@@ -52,6 +52,8 @@ cities = {
     "rov": {"val": "rostov-na-donu", "ru": "Ростов-на-Дону, Россия", "plus": 0},
     "chl": {"val": "chelyabinsk", "ru": "Челбинск, Россия", "plus": 2},
     "sch": {"val": "sochi", "ru": "Сочи, Россия", "plus": 0},
+    "abk": {"val": "abakan", "ru": "Абакан, Россия", "plus": 4},
+    "krs": {"val": "krasnoyarsk", "ru": "Красноярск, Россия", "plus": 4},
     "evn": {"val": "erevan", "ru": "Ереван, Армения", "plus": 1},
     "tbs": {"val": "tbilisi", "ru": "Тбилиси, Грузия", "plus": 1}
 }
