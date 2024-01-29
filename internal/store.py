@@ -8,6 +8,14 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from loguru import logger
 
+def singleton(class_):
+    instances = {}
+    def get_instance(*args, **kwargs):
+        if class_ not in instances:
+            instances[class_] = class_(*args, **kwargs)
+        return instances[class_]
+    return get_instance
+
 Base = declarative_base()
 Metadata = MetaData()
 
@@ -25,6 +33,7 @@ Users = Table(
 class User(Base):
     __table__ = Users
 
+@singleton
 class Database:
     def __init__(self, engine):
         self.engine = create_engine(engine)

@@ -7,9 +7,9 @@ from internal import logger
 from bs4 import BeautifulSoup as BS
 from internal.content import horoscopes, cities
 from internal.content import notify_timers as ntv_d
+from functools import cache
 
 locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
-
 
 def get_finance_rub(valutes: list[str]):
     try:
@@ -102,6 +102,7 @@ def get_emoji_by_weather(weather: str):
             emoji = ws.emoji
     return emoji
 
+@cache
 def pretty_info(city="msk"):
     finance = ''
     # weather_day = ''

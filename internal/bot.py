@@ -82,7 +82,7 @@ async def notify():
         if not notify_list:
             continue
         for tbn in notify_list:
-            if tbn <= get_current_time(u.city) <= (tbn + timedelta(minutes=5)):
+            if tbn <= get_current_time(u.city) <= (tbn + timedelta(seconds=2)):
                 skip = False
         if not skip:
             if u.city not in ["msk", None]:
@@ -90,8 +90,8 @@ async def notify():
             try:
                 await bot.send_message(u.uuid, get_format_message(u, mess), parse_mode="markdown")
             except Exception as err:
-                logger.error(err)
-                await db.delete_user(u)
+                logger.warning(err)
+                db.delete_user(u)
         # else:
         #     logger.debug(f"Skip user for notify: {u.uuid}")
 
