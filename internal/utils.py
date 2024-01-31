@@ -102,7 +102,6 @@ def get_emoji_by_weather(weather: str):
             emoji = ws.emoji
     return emoji
 
-@cache
 def pretty_info(city="msk"):
     finance = ''
     # weather_day = ''
@@ -160,10 +159,12 @@ def set_notify_all_users(engine: str):
 
 # notify value: 1, 2, 4
 def get_time_by_notify(notify: int):
+    if not notify: return []
     morning = ntv_d.get(1).get("val")
     daytime = ntv_d.get(2).get("val")
     evening = ntv_d.get(4).get("val")
     targets = {
+        0: [],
         1: [morning],
         2: [daytime],
         3: [morning, daytime],
@@ -175,10 +176,12 @@ def get_time_by_notify(notify: int):
     return targets.get(notify)
 
 def get_timestr_by_notify(notify: int):
+    if not notify: return []
     morning = "morning"
     daytime = "daytime"
     evening = "evening"
     targets = {
+        0: [],
         1: [morning],
         2: [daytime],
         3: [morning, daytime],
