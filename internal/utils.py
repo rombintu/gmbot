@@ -192,6 +192,7 @@ def get_timestr_by_notify(notify: int):
     }
     return targets.get(notify)
 
+# TODO
 def notify_is_enable(user_time: int, time_str: str):
     if time_str in get_timestr_by_notify(user_time):
         return True
