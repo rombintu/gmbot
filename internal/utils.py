@@ -23,8 +23,8 @@ def get_finance_rub(valutes: list[str]):
 
 def get_finance_bitcoin():
     try:
-        req = requests.get('https://api.binance.com/api/v3/ticker/price?symbol=BTCRUB').json()
-        return int(req['price'].split(".")[0])
+        req: dict = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json').json()
+        return int(req.get('bpi').get('USD').get('rate_float'))
     except Exception as err:
         print(err)
         return 0
@@ -122,7 +122,7 @@ def pretty_info(city="msk"):
 {curs_dict.get('EUR')} 💶 \
 {curs_dict.get('AMD') + ' 🇦🇲 ' if city == 'evn' else ""}\
 {curs_dict.get('GEL') + ' 🇬🇪 ' if city == 'tbs' else ""}\
-{bitcoin:,} 💎_"""
+${bitcoin:,} 💎_"""
 
     holidays = get_holiday()[0]
     if not holidays:
