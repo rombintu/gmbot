@@ -2,11 +2,16 @@ import pytest
 
 from internal.utils import get_weather_meteoservice_ru, pretty_info
 from internal import Text, draw
+from internal import utils
 
 def test_weather():
     weather = get_weather_meteoservice_ru()
     print(weather)
 
+def test_finance_bitcoin():
+    b = utils.get_finance_bitcoin()
+    print(b)
+    
 def test_pretty_info():
     buff = pretty_info()
     print(buff)
