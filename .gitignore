@@ -6,3 +6,4 @@ assets/*
 tmp/*
 !.gitkeep
 venv
+.venv

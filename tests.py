@@ -1,25 +1,16 @@
 import pytest 
-
-from internal.utils import get_weather_meteoservice_ru, pretty_info
-from internal import Text, draw
-from internal import utils
+from api.weather import cities, log
+from tools.image import Assets, ImageDraw, Pointer
 
 def test_weather():
-    weather = get_weather_meteoservice_ru()
-    print(weather)
-
-def test_finance_bitcoin():
-    b = utils.get_finance_bitcoin()
-    print(b)
-    
-def test_pretty_info():
-    buff = pretty_info()
-    print(buff)
+    msk = cities.get('msk')
+    msk.load_waether()
+    data = msk.waether()
+    assert data is not None, "Weather data not loaded"
+    log.info(f"Weather data for Moscow: {data}")
 
 def test_draw():
-    text = Text("В прогнозе на сегодня \nв Москве холодная слегка\n облачная погода. Диапазон температур от -20 до -13° днем и от -16 до -13 ночью. Ожидается маловетреная погода,\n в основном 6 м/с, порывами до 12 м/с. Днем осадков не ожидается.  Уделите пару минут почасовому прогнозу ниже")
-    draw(text)
-
-
-# if __name__ == '__main__':
-    # 
+    canvas = Assets(300, "./assets")
+    canvas.draw_weather_temp( "light-rain", "+11°C", "+10°C")
+    canvas.draw_suntime("07:00", "21:00")
+    canvas.bg_image.save(canvas.save_path)
